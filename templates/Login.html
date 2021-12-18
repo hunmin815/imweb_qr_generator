@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" class="Gibbu_@hotmail.com">
+<head>
+  <meta charset="UTF-8">
+  <title>MALDEN QR코드 생성 시스템</title>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="./static/Login/style.css">
+  <script  src="./static/Login/script.js"></script>
+
+<script defer src="https://use.fontawesome.com/releases/v5.0.1/js/all.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.transit/0.9.12/jquery.transit.js" integrity="sha256-mkdmXjMvBcpAyyFNCVdbwg4v+ycJho65QLDwVE3ViDs=" crossorigin="anonymous"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+{%with messages = get_flashed_messages()%}
+{%if messages %}
+  <script type="text/javascript">
+    alert("{{messages[-1]}}");
+  </script>
+  {%endif%}
+{%endwith%}
+
+<script>
+  function Register(){
+    alert("관리자에게 문의바랍니다.");
+  };
+</script>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- NORMALIZED CSS INSTALLED-->
+<!-- View settings for more info.-->
+<div id="container">
+  <div id="inviteContainer">
+    <div class="logoContainer"><img class="logo" src="./static/Login/MALDEN_icon.png"/><img class="text" src="./static/Login/MALDEN_Logo.png"/></div>
+    <div class="acceptContainer">
+      <form action="/login" method="POST">
+        <h1>WELCOME BACK!</h1>
+        <div class="formContainer">
+          <div class="formDiv" style="transition-delay: 0.1s">
+            <p>ID</p>
+            <input type="text" name="user_id" required="" placeholder="아이디" autofocus autocomplete="off"/>
+          </div>
+          <div class="formDiv" style="transition-delay: 0.2s">
+            <p>PASSWORD</p>
+            <input type="password" name="user_pw" required="" placeholder="비밀번호" autocomplete="off"/>
+            <!-- <a class="forgotPas" href="#">FORGOT YOUR PASSWORD?</a> -->
+          </div>
+          <div class="formDiv" style="transition-delay: 0.4s">
+            <button class="acceptBtn" type="submit">Login</button>
+            <span class="register">Need an account?<a href="#" onclick="Register();">Register</a></span>
+            <span class="register" style="font-size: 9px;">본 페이지는 엘엔케이즈 임직원용이며, <br>허가되지 않은 사용자는 법적인 책임을 물을 수 있습니다. <br>Unauthorized users held liable.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- partial -->
+  
+
+</body>
+</html>

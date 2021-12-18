@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta name="google" content="notranslate">
+    <meta charset="utf-8">
+    <title>MALDEN QR코드 생성 시스템</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+      $(document).ready(function () {
+        history.pushState('','','./qr_gen_one')             // 동기화 후 URL 변경하기
+        loading_exit();
+      });
+
+    function go_checkbox(){
+    var idx_chk = $('.size');
+      if(idx_chk.is(':checked')==false){
+          alert('사이즈를 선택 해주세요\n(Please choose a size)');
+          return false;
+      }
+      else{
+            var cksum = 0;
+            var ckcount = document.getElementsByClassName('size').length;
+            // alert(ckcount);
+            for(var i=0; i < ckcount; i++ ){
+              if( document.getElementsByClassName('size')[i].checked == true ){
+                cksum += 1;
+              }
+            }
+          // alert("체크박스 개수 : " + cksum);
+          document.getElementById('ck_count').value=cksum;
+
+          // 체크 박스 확인
+          if(document.getElementById('size_XS').checked == true){
+              document.getElementById('hidden_size_XS').value='XS';
+          }else{document.getElementById('hidden_size_XS').value='False';}
+
+          if(document.getElementById('size_S').checked == true){
+              document.getElementById('hidden_size_S').value='S';
+          }else{document.getElementById('hidden_size_S').value='False';}
+
+          if(document.getElementById('size_M').checked == true){
+              document.getElementById('hidden_size_M').value='M';
+          }else{document.getElementById('hidden_size_M').value='False';}
+
+          if(document.getElementById('size_L').checked == true){
+              document.getElementById('hidden_size_L').value='L';
+          }else{document.getElementById('hidden_size_L').value='False';}
+
+          if(document.getElementById('size_XL').checked == true){
+              document.getElementById('hidden_size_XL').value='XL';
+          }else{document.getElementById('hidden_size_XL').value='False';}
+          
+          if(document.getElementById('size_F').checked == true){
+              document.getElementById('hidden_size_F').value='F';
+          }else{document.getElementById('hidden_size_F').value='False';}
+
+          refresh_start();
+          loading_start();
+          document.getElementsByClassName('QR_input').submit();
+      }
+    }
+
+    function refresh_start(){
+      setTimeout("refresh_fn()", 3500);
+    }
+    
+    function refresh_fn(){
+      location.reload();
+    };
+</script>
+  </head>
+  <body>
+    <!-- Loading 화면 START -->
+    <script type="text/javascript">
+      function loading_start(){
+          $("#load").show();
+      }
+      function loading_exit(){
+          $("#load").hide();
+      }
+    </script>
+    <style type="text/css">
+      #load {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        display: block;
+        opacity: 0.9;
+        background: white;
+        z-index: 99;
+        text-align: center;
+      }
+    
+      #load>img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 100;
+        zoom: 0.3;
+      }
+    </style>
+    <div id="load"> <img src="./static/qr_gen/images/loading_img.gif" alt="loading"> </div>
+    <!-- Loading 화면 END -->
+
+    <div>{{user_id}}님 &nbsp;<button href="#" onclick="location.href='/logout'">로그아웃</button></div>
+    <form class="QR_input" action="/gen_complete" method="post">
+      <label for="custom_prod_code">자체 상품코드</label>
+      <input type="text" name="custom_prod_code" id="custom_prod_code" value="" placeholder="custom_prod_code"><br>
+      <label for="product_name">상품명</label>
+      <input type="text" name="product_name" id="product_name" value="" placeholder="product_name"><br>
+      <label for="Quantity">수량</label>
+      <input type="text" name="Quantity" id="Quantity" value="" placeholder="Quantity"><br>
+      
+      <label>옷 사이즈 (size)</label>
+
+      <b><label for="size_XS">XS</label></b>
+      <input type="checkbox" name="ck_size_XS" class="size" id="size_XS" value="XS">
+               <input type="hidden" name="size_XS" id="hidden_size_XS" value="False"/>
+
+      <b><label for="size_S">S</label></b>
+              <input type="checkbox" name="ck_size_S" class="size" id="size_S" value="S">
+              <input type="hidden" name="size_S" id="hidden_size_S" value="False"/>
+
+      <b><label for="size_M">M</label></b>
+              <input type="checkbox" name="ck_size_M" class="size" id="size_M" value="M">
+              <input type="hidden" name="size_M" id="hidden_size_M" value="False"/>
+
+      <b><label for="size_L">L</label></b>
+              <input type="checkbox" name="ck_size_L" class="size" id="size_L" value="L">
+              <input type="hidden" name="size_L" id="hidden_size_L" value="False"/>
+
+      <b><label for="size_XL">XL</label></b>
+               <input type="checkbox" name="ck_size_XL" class="size" id="size_XL" value="XL">
+               <input type="hidden" name="size_XL" id="hidden_size_XL" value="False"/>
+
+      <b><label for="size_F">F</label></b>
+               <input type="checkbox" name="ck_size_F" class="size" id="size_F" value="F">
+               <input type="hidden" name="size_F" id="hidden_size_F" value="False"/>
+
+      <input type="hidden" name="ck_count" id="ck_count"/><br><br>
+      <div class="submit-wrap">
+  			<!-- <input type="submit" value="QR 생성" class="submit" /> -->
+        <button href="#" onclick="go_checkbox(); return false;">QR 생성</button>
+			</div>
+    </form>
+  </body>
+</html>

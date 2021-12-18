@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta name="google" content="notranslate">
+    <meta charset="utf-8">
+    <title>MALDEN QR코드 생성 시스템</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+{%with messages = get_flashed_messages()%}
+{%if messages %}
+  <script type="text/javascript">
+    alert("{{messages[-1]}}");
+  </script>
+  {%endif%}
+{%endwith%}
+<script>
+    $(document).ready(function () {
+        history.pushState('','','./qr_gen_box')             // 동기화 후 URL 변경하기
+        loading_exit();
+      });
+
+    function go_checkbox(){
+    var idx_chk = $('.size');
+      if(idx_chk.is(':checked')==false){
+        $('#div_form_count').val(div_form_count);
+        $('#id_num_array').val(id_num_array);
+        document.getElementsByClassName('QR_input').submit();
+          alert('사이즈를 선택 해주세요\n(Please choose a size)');
+          return false;
+      }
+      else{
+            var cksum = 0;
+            var ckcount = document.getElementsByClassName('size').length;
+            // alert(ckcount);
+            for(var i=0; i < ckcount; i++ ){
+              if( document.getElementsByClassName('size')[i].checked == true ){
+                cksum += 1;
+              }
+            }
+          // alert("체크박스 개수 : " + cksum);
+          document.getElementById('ck_count').value=cksum;
+
+            $('#div_form_count').val(div_form_count);
+            $('#id_num_array').val(id_num_array);
+
+          refresh_start();
+          loading_start();
+          document.getElementsByClassName('QR_input').submit();
+      }
+    }
+
+    function refresh_start(){
+      setTimeout("refresh_fn()", 3500);
+    }
+    
+    function refresh_fn(){
+      location.reload();
+    };
+</script>
+
+<style>
+  input[type=number] {
+    width: 60px;
+    height: 20px;
+    vertical-align: 2px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  input[type=number]:hover::-webkit-inner-spin-button {
+    height: 23px;                                                                 /* number 내부 증감 버튼 사이즈 */
+  }
+</style>
+
+<!-- 폼 동작 START -->
+<script>
+      
+    var create_check = 1;                                                         // 추가 폼 생성 여부 체크 1
+    var id_check = "div_form_0";                                                  // 추가 폼 생성 여부 체크 2
+    var id_num = 1;                                                               // 폼 id 번호
+    var div_form_count = 1;                                                       // 페이지 내 폼 개수 체크
+    var id_num_array = [0,];                                                      // 페이지 내 생성된 폼 id 배열
+    // $('input:checkbox').on('click', function () {
+    $(document).on('click', 'input:checkbox', function () {
+      console.log("");
+      console.log("id_num : "+id_num);
+      
+      console.log("parent_next_id : "+$(this).parent().next().attr('id'));
+      if ($(this).parent().attr('id') != "div_form_0" 
+      && $(this).parent().attr('id') != $(this).parent().prev().attr('id') 
+      && $(this).parent().next().attr('id') != undefined 
+      && $(this).parent().next().attr('id') != id_check 
+      && $(this).parent().next().attr('id') == "ck_count"){
+        create_check = 1;
+      }
+      else if($(this).parent().attr('id') != "div_form_0"){
+        create_check = 0;
+      }
+      // else if($(this).parent().attr('id') == "div_form_0"){
+      //   id_num = 1;
+      // }
+
+      if ($(this).prop('checked')) {
+        var number_id = '#'+$(this).next().attr('id');                            // 체크박스 다음 태그의 id 가져오기
+        $(number_id).attr('disabled', false);                                     // 체크시 입력창 활성화
+
+                                                                                  // 체크시 포커스 기능 START
+        $(number_id).focus();
+        var focus_tmp_value = $(number_id).val();
+        if ($(number_id).val() == '0'){
+        $(number_id).val('');
+        }
+        else{
+          $(number_id).val('');
+          $(number_id).val(focus_tmp_value);
+        }
+                                                                                  // 체크시 포커스 기능 END
+
+        var div_form = '#'+$(this).parent().attr('id');
+        console.log("create_check : "+create_check);
+        if($(div_form).children('input:checkbox').is(':checked') && create_check == 1 && $(this).parent().next().attr('id') == "ck_count"){
+          afterValue = `<div id="div_form_`+String(id_num)+`"><br>
+            <label for="custom_prod_code_`+String(id_num)+`">자체 상품코드</label>
+            <input type="text" name="custom_prod_code_`+String(id_num)+`" id="custom_prod_code_`+String(id_num)+`" value="" placeholder="custom_prod_code"><br>
+            <label for="product_name_`+String(id_num)+`">상품명&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" name="product_name_`+String(id_num)+`" id="product_name_`+String(id_num)+`" value="" placeholder="product_name" style="margin-left: -3px;"><br>
+            
+            <label>사이즈 및 수량</label>
+
+            <b><label for="size_XS_`+String(id_num)+`" style="cursor:pointer;">XS&nbsp;</label></b>
+            <input type="checkbox" name="ck_size_XS_`+String(id_num)+`" class="size" id="size_XS_`+String(id_num)+`" value="XS" style="zoom: 1.2; margin-left: -7px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_XS_`+String(id_num)+`" id="Quantity_XS_`+String(id_num)+`" title="XS" disabled>
+                    <input type="hidden" name="size_XS_`+String(id_num)+`" id="hidden_size_XS_`+String(id_num)+`" value="False"/>
+
+            <b><label for="size_S_`+String(id_num)+`" style="cursor:pointer;">&nbsp;S&nbsp;</label></b>
+                    <input type="checkbox" name="ck_size_S_`+String(id_num)+`" class="size" id="size_S_`+String(id_num)+`" value="S" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_S_`+String(id_num)+`" id="Quantity_S_`+String(id_num)+`" title="S" disabled>
+                    <input type="hidden" name="size_S_`+String(id_num)+`" id="hidden_size_S_`+String(id_num)+`" value="False"/>
+
+            <b><label for="size_M_`+String(id_num)+`" style="cursor:pointer; margin-left: -3px;">&nbsp;M&nbsp;</label></b>
+                    <input type="checkbox" name="ck_size_M_`+String(id_num)+`" class="size" id="size_M_`+String(id_num)+`" value="M" style="zoom: 1.2; margin-left: -6px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_M_`+String(id_num)+`" id="Quantity_M_`+String(id_num)+`" title="M" disabled>
+                    <input type="hidden" name="size_M_`+String(id_num)+`" id="hidden_size_M_`+String(id_num)+`" value="False"/>
+
+            <b><label for="size_L_`+String(id_num)+`" style="cursor:pointer;">&nbsp;L&nbsp;</label></b>
+                    <input type="checkbox" name="ck_size_L_`+String(id_num)+`" class="size" id="size_L_`+String(id_num)+`" value="L" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_L_`+String(id_num)+`" id="Quantity_L_`+String(id_num)+`" title="L" disabled>
+                    <input type="hidden" name="size_L_`+String(id_num)+`" id="hidden_size_L_`+String(id_num)+`" value="False"/>
+
+            <b><label for="size_XL_`+String(id_num)+`" style="cursor:pointer;">XL&nbsp;</label></b>
+                    <input type="checkbox" name="ck_size_XL_`+String(id_num)+`" class="size" id="size_XL_`+String(id_num)+`" value="XL" style="zoom: 1.2; margin-left: -7px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_XL_`+String(id_num)+`" id="Quantity_XL_`+String(id_num)+`" title="XL" disabled>
+                    <input type="hidden" name="size_XL_`+String(id_num)+`" id="hidden_size_XL_`+String(id_num)+`" value="False"/>
+
+            <b><label for="size_F_`+String(id_num)+`" style="cursor:pointer;">&nbsp;F&nbsp;</label></b>
+                    <input type="checkbox" name="ck_size_F_`+String(id_num)+`" class="size" id="size_F_`+String(id_num)+`" value="F" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+                    <input type="number" value="0" min="0" name="Quantity_F_`+String(id_num)+`" id="Quantity_F_`+String(id_num)+`" title="F" disabled>
+                    <input type="hidden" name="size_F_`+String(id_num)+`" id="hidden_size_F_`+String(id_num)+`" value="False"/><input type="button" onclick="go_delete(`+id_num+`);" id="delete" value="삭제">
+            </div>`
+          $('#'+$(this).parent().attr('id')).after(afterValue);                 // 체크한 부모id 다음 태그에 추가
+          id_check = 'div_form_'+String(id_num);
+          id_num_array.push(id_num);
+          console.log("push_id_num_array : " + id_num_array)
+          id_num++;
+          div_form_count++;
+        }
+        create_check = 0;
+      }
+      else{
+        var number_id = '#'+$(this).next().attr('id');      // 체크박스 다음 태그의 id 가져오기
+        $(number_id).attr('disabled', true);                // 체크 해제시 입력창 비활성화
+        $(number_id).val('0');
+        var div_form = '#'+$(this).parent().attr('id');
+        console.log($(this).parent().attr('id'));
+        console.log("div_form_"+String(id_num-2));
+        if($(div_form).children('input:checkbox').is(':checked') == false  && $(this).parent().attr('id') == "div_form_"+String(id_num-2) || id_num == 1){
+          create_check = 1;
+          // if ((id_num-1) > 0) {
+          //   id_check = 'div_form_'+String(id_num-1);
+          //   // $('#div_form_' + String(id_num-1)).remove();
+          //   id_num--;
+          // }
+        }
+      }
+    });
+
+    // 추가된 입력폼 삭제 버튼 START
+    function go_delete(num){
+      // var remove_id = $('#div_form_'+String(num));
+      console.log("remove_num : "+num);
+      $('#div_form_'+String(num)).remove();
+      create_check = 1;
+      id_check = 'div_form_'+String(id_num-1);
+      var idx = id_num_array.indexOf(num);
+      if (idx > -1) {
+        id_num_array.splice(idx, 1);
+        console.log("del_id_num_array : " + id_num_array)
+      }
+      id_num++;
+      div_form_count--;
+    }
+    // 추가된 입력폼 삭제 버튼 END
+
+</script>
+<!-- 폼 동작 END -->
+  </head>
+  <body>
+    <!-- Loading 화면 START -->
+    <script type="text/javascript">
+      function loading_start(){
+          $("#load").show();
+      }
+      function loading_exit(){
+          $("#load").hide();
+      }
+    </script>
+    <style type="text/css">
+      #load {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        display: block;
+        opacity: 0.9;
+        background: white;
+        z-index: 99;
+        text-align: center;
+      }
+    
+      #load>img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 100;
+        zoom: 0.3;
+      }
+    </style>
+    <div id="load"> <img src="./static/qr_gen/images/loading_img.gif" alt="loading"> </div>
+    <!-- Loading 화면 END -->
+
+    <div>{{user_id}}님 &nbsp;<button href="#" onclick="location.href='/logout'">로그아웃</button></div>
+    <!-- <form class="QR_input" action="/gen_complete" method="post"> -->
+    <form class="QR_input" action="/gen_box_complete" method="post">
+      <div id="div_form_0">
+      <label for="custom_prod_code_0">자체 상품코드</label>
+      <input type="text" name="custom_prod_code_0" id="custom_prod_cod_0e" value="" placeholder="custom_prod_code" autofocus><br>
+      <label for="product_name_0">상품명&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <input type="text" name="product_name_0" id="product_name_0" value="" placeholder="product_name" style="margin-left: -3px;"><br>
+      
+      <label>사이즈 및 수량</label>
+
+      <b><label for="size_XS_0" style="cursor:pointer;">XS&nbsp;</label></b>
+      <input type="checkbox" name="ck_size_XS_0" class="size" id="size_XS_0" value="XS" style="zoom: 1.2; margin-left: -7px; vertical-align: -2px; cursor:pointer;">
+               <input type="number" value="0" min="0" name="Quantity_XS_0" id="Quantity_XS_0" title="XS" disabled>
+               <input type="hidden" name="size_XS_0" id="hidden_size_XS_0" value="False"/>
+
+      <b><label for="size_S_0" style="cursor:pointer;">&nbsp;S&nbsp;</label></b>
+              <input type="checkbox" name="ck_size_S_0" class="size" id="size_S_0" value="S" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+              <input type="number" value="0" min="0" name="Quantity_S_0" id="Quantity_S_0" title="S" disabled>
+              <input type="hidden" name="size_S_0" id="hidden_size_S_0" value="False"/>
+
+      <b><label for="size_M_0" style="cursor:pointer; margin-left: -3px;">&nbsp;M&nbsp;</label></b>
+              <input type="checkbox" name="ck_size_M_0" class="size" id="size_M_0" value="M" style="zoom: 1.2; margin-left: -6px; vertical-align: -2px; cursor:pointer;">
+              <input type="number" value="0" min="0" name="Quantity_M_0" id="Quantity_M_0" title="M" disabled>
+              <input type="hidden" name="size_M_0" id="hidden_size_M_0" value="False"/>
+
+      <b><label for="size_L_0" style="cursor:pointer;">&nbsp;L&nbsp;</label></b>
+              <input type="checkbox" name="ck_size_L_0" class="size" id="size_L_0" value="L" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+              <input type="number" value="0" min="0" name="Quantity_L_0" id="Quantity_L_0" title="L" disabled>
+              <input type="hidden" name="size_L_0" id="hidden_size_L_0" value="False"/>
+
+      <b><label for="size_XL_0" style="cursor:pointer;">XL&nbsp;</label></b>
+               <input type="checkbox" name="ck_size_XL_0" class="size" id="size_XL_0" value="XL" style="zoom: 1.2; margin-left: -7px; vertical-align: -2px; cursor:pointer;">
+               <input type="number" value="0" min="0" name="Quantity_XL_0" id="Quantity_XL_0" title="XL" disabled>
+               <input type="hidden" name="size_XL_0" id="hidden_size_XL_0" value="False"/>
+
+      <b><label for="size_F_0" style="cursor:pointer;">&nbsp;F&nbsp;</label></b>
+               <input type="checkbox" name="ck_size_F_0" class="size" id="size_F_0" value="F" style="zoom: 1.2; margin-left: -3px; vertical-align: -2px; cursor:pointer;">
+               <input type="number" value="0" min="0" name="Quantity_F_0" id="Quantity_F_0" title="F" disabled>
+               <input type="hidden" name="size_F_0" id="hidden_size_F_0" value="False"/>
+      </div>
+      <input type="hidden" name="ck_count" id="ck_count"/>
+      <input type="hidden" name="div_form_count" id="div_form_count"/>
+      <input type="hidden" name="id_num_array" id="id_num_array"/><br><br>
+      <div class="submit-wrap">
+  			<!-- <input type="submit" value="QR 생성" class="submit" /> -->
+        <button href="#" onclick="go_checkbox(); return false;">QR 생성</button>
+			</div>
+    </form>
+  </body>
+</html>
